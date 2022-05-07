@@ -6,7 +6,7 @@ const { promisify } = require("util");
 const FragmentRecoder = require("./fragment_recoder");
 
 const encode_dir = path.resolve(__dirname, "./encode/");
-const input_file = path.resolve(__dirname, "./input/test2.mp4");
+const input_file = path.resolve(__dirname, "./input/20210312_1782415fad5_r1.mp4");
 
 /** 用户的唯一签名秘钥是一个uuid **/
 const secret_key = "f0cb9403-3766-4fea-9dc6-e129a1488c55";
@@ -19,7 +19,7 @@ async function encode() {
   record.origin_file_path = input_file;
   record.origin_file_content = resource_buffer.buffer;
   /** 计算切片大小 **/
-  const unit_size = 2048000;
+  const unit_size = 128000;
   record.unit_size = unit_size;
   /** 计算头部的二进制填充 **/
   // const header_pedding_buffer = new Uint8Array(Array(unit_size).fill(1));
@@ -36,10 +36,10 @@ async function encode() {
   let current_count = 0;
   // const splite_sign_array = [];
   while (current_count !== splite_block) {
-    const every_origin_block = new Uint8Array(concat_resourse_buffer.buffer.slice(current_count * unit_size, unit_size * (current_count + 1)));
-    const every_origin_content = every_origin_block.toString();
+    const every_origin_block = concat_resourse_buffer.slice(current_count * unit_size, unit_size * (current_count + 1));
+    const every_origin_content = new Uint8Array(every_origin_block.buffer);
     const output_file_path = path.join(encode_dir, `${current_count + 1}.txt`);
-    const encode_content = CryptoJS.AES.encrypt(every_origin_content, secret_key).toString();
+    const encode_content = CryptoJS.AES.encrypt(every_origin_content.toString(), secret_key).toString();
     await promisify(fs.writeFile)(output_file_path, encode_content, "utf-8");
     current_count += 1;
     console.log(`fragment ${current_count} complate!`);

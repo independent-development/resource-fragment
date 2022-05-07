@@ -19,19 +19,20 @@ async function decode() {
   console.log(record);
   const { origin_file_name, origin_file_size } = record;
   // const header_pedding_buffer = new Uint8Array(Array(unit_size).fill(0));
-  const match_fragment = await promisify(glob)(encode_glob);
-  const decode_task = match_fragment.slice(1, match_fragment.length).map(async (single_fragment_path, index) => {
+  const match_all_fragment = await promisify(glob)(encode_glob);
+  const match_file_fragment = match_all_fragment.slice(1, match_all_fragment.length).sort((prev, next) => {
+    const prev_number = path.basename(prev).replace(".txt", "");
+    const next_number = path.basename(next).replace(".txt", "");
+    return prev_number - next_number;
+  });
+  const decode_task = match_file_fragment.map(async (single_fragment_path, index) => {
     console.log(`正在处理第 ${index + 1} 个片段`);
     const single_fragment_content = await promisify(fs.readFile)(single_fragment_path, "utf-8");
-    // console.log(single_fragment_content);
     const decrypt_origin_content = CryptoJS.AES.decrypt(single_fragment_content, secret_key).toString(CryptoJS.enc.Utf8);
-    // const decode_origin_content = new Uint8Array(decrypt_origin_content.split(","));
-    const single_fragment_array = decrypt_origin_content.split(",");
     console.log(`第 ${index + 1} 个片段处理完成!`);
-    return new Uint8Array(single_fragment_array);
+    return new Uint8Array(decrypt_origin_content.split(","));
   });
   const concat_decode_content = Buffer.concat(await Promise.all(decode_task));
-  console.log(concat_decode_content);
   const origin_file_content = concat_decode_content.slice(0, origin_file_size);
   const save_file_path = path.join(decode_dir, origin_file_name);
   await promisify(fs.writeFile)(save_file_path, origin_file_content, "utf-8");
