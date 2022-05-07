@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "encode": "rm -rf encode && mkdir encode &&node --max-old-space-size=8192 encode.js",
+    "encode": "node --max-old-space-size=8192 encode.js",
     "decode": "node --max-old-space-size=8192 decode.js"
   },
   "keywords": [],
