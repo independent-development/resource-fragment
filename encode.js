@@ -6,26 +6,26 @@ const { promisify } = require("util");
 const FragmentRecoder = require("./fragment_recoder");
 
 const encode_dir = path.resolve(__dirname, "./encode/");
-const input_file = path.resolve(__dirname, "./input/20210312_1782415fad5_r1.mp4");
+const input_file = path.resolve(__dirname, "./input/test2.mp4");
 
 /** 用户的唯一签名秘钥是一个uuid **/
 const secret_key = "f0cb9403-3766-4fea-9dc6-e129a1488c55";
 /** 暂且使用2048000的单位对文件进行切片 **/
-const unit_size = 2048000;
+const unit_size = 20480000;
 
 async function encode() {
   /** 实例化一个过程记录者 **/
   const record = new FragmentRecoder();
+  record.unit_size = unit_size;
   record.origin_file_path = input_file;
   const resource_buffer = await promisify(fs.readFile)(input_file);
-  record.origin_file_content = resource_buffer;
+  record.origin_file_content = resource_buffer.buffer;
   /** 计算头部的二进制填充 **/
   const header_buffer_pedding = Buffer.from(Array(unit_size).fill(0));
   /** 文件尾需要填充的字符串 **/
-  const footer_buffer_pedding = Buffer.from(Array(unit_size - resource_buffer.length).fill(0));
+  const footer_buffer_pedding = Buffer.from(Array(Math.abs(unit_size - resource_buffer.length % unit_size)).fill(0));
   /** 获取到最终资源的内容 **/
   const concat_resourse_buffer = Buffer.concat([header_buffer_pedding, resource_buffer, footer_buffer_pedding]);
-  // console.log(concat_resourse_buffer.length);
   /** 计算文件实际需要切割的份数 **/
   record.concat_content_size = concat_resourse_buffer.length;
   const splite_block = parseInt(concat_resourse_buffer.length / unit_size);

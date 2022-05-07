@@ -24,7 +24,7 @@ module.exports = class FragmentRecoder {
     /** 原始文件的大小 **/
     this.origin_file_size = 0;
     /** 原始文件的md5值 **/
-    this.md5 = "";
+    // this.md5 = "";
     /** 经过拼接之后的文件实际大小 **/
     this.concat_content_size = 0;
   }
@@ -32,8 +32,8 @@ module.exports = class FragmentRecoder {
     this.origin_file_name = path.basename(value);
   }
   set origin_file_content(value) {
-    const content_string = value.toString();
-    this.md5 = md5(content_string);
-    this.origin_file_size = value.length;
+    // const content_string = value.byteLength;
+    this.md5 = md5(value);
+    this.origin_file_size = value.byteLength;
   }
 }
