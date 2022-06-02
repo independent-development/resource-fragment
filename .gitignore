@@ -1,6 +1,8 @@
 /input/
 /encode/
 /decode/
+/encode-av/
+/encode-test2/
 /node_modules/
 **/.DS_Store
 package-lock.json

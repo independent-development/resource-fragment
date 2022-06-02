@@ -6,7 +6,7 @@ const { promisify } = require("util");
 const FragmentRecoder = require("./fragment_recoder");
 
 const encode_dir = path.resolve(__dirname, "./encode/");
-const input_file = path.resolve(__dirname, "./input/test2.mp4");
+const input_file = path.resolve(__dirname, "./input/test1.mp4");
 
 /** 用户的唯一签名秘钥是一个uuid **/
 const secret_key = "f0cb9403-3766-4fea-9dc6-e129a1488c55";
@@ -19,7 +19,7 @@ async function encode() {
   record.origin_file_path = input_file;
   record.origin_file_content = resource_buffer.buffer;
   /** 计算切片大小 **/
-  const unit_size = 2048000;
+  const unit_size = 4096000;
   record.unit_size = unit_size;
   /** 计算头部的二进制填充 **/
   // const header_pedding_buffer = new Uint8Array(Array(unit_size).fill(1));
